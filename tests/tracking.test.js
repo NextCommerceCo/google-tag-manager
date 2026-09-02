@@ -32,6 +32,17 @@ test('does nothing without a container id', () => {
     assert.deepEqual(Object.keys(boot({ google_tag_manager_container_id: '' }).handlers), []);
 });
 
+test('a whitespace container id counts as unset', () => {
+    assert.deepEqual(Object.keys(boot({ google_tag_manager_container_id: '  ' }).handlers), []);
+});
+
+test('cart events without a line payload are dropped', () => {
+    const { top, emit } = boot({});
+    emit('product_added_to_cart', undefined);
+    emit('product_removed_from_cart', { quantity: 1 });
+    assert.equal(top.dataLayer.length, 0);
+});
+
 test('creates the dataLayer when the container has not loaded yet', () => {
     const { top, emit } = boot({}, { withDataLayer: false });
     assert.doesNotThrow(() => emit('page_viewed', {}));

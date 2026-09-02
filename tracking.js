@@ -2,7 +2,8 @@
 // Runs in the platform's sandboxed tracker frame; the dataLayer lives on the storefront window
 // (window.top), created by snippets/global-header.html. push() creates it if the container has not
 // loaded yet so an early event is queued rather than thrown away.
-if (app.settings.google_tag_manager_enabled && app.settings.google_tag_manager_container_id) {
+// The snippet applies the same gate (.strip in the template), so both halves agree on when the app is on.
+if (app.settings.google_tag_manager_enabled && String(app.settings.google_tag_manager_container_id || '').trim()) {
     (function () {
 
         var push = function (payload) {
@@ -121,7 +122,8 @@ if (app.settings.google_tag_manager_enabled && app.settings.google_tag_manager_c
 
         var cartLineEvent = function (name) {
             return function (event) {
-                var line = event.data || {};
+                var line = event.data;
+                if (!line || line.product_id == null) { return; }
                 pushEcommerce(name, {
                     currency: line.currency,
                     value: num(line.price_incl_tax),

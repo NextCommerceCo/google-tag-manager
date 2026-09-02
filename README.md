@@ -31,4 +31,4 @@ Each ecommerce push is preceded by `{ ecommerce: null }` as Google recommends. I
 npm test
 ```
 
-`tests/tracking.test.js` runs `tracking.js` with the platform's globals (`app`, `analytics`, `window.top`) and asserts every push. No dependencies; Node 20+.
+`tests/tracking.test.js` runs `tracking.js` with the platform's globals (`app`, `analytics`, `window.top`) and asserts every push. No dependencies; Node 22, the version CI runs.
