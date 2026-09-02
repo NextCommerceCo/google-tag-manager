@@ -1,19 +1,14 @@
 # Google Tag Manager
 
-Google Tag Manager app for Next Commerce that integrates Google Tag Manager into any storefront theme with [Storefront Event Tracking](https://developers.nextcommerce.com/docs/storefront/event-tracking). App also includes [Enhanced Ecommerce for Tag Manager](https://developers.google.com/analytics/devguides/collection/ua/gtm/enhanced-ecommerce) event tracking using the Data Layer.
+Google Tag Manager app for Next Commerce. Installs the GTM container on any storefront theme and pushes GA4-style ecommerce events to the `dataLayer` through [Storefront Event Tracking](https://developers.nextcommerce.com/docs/storefront/event-tracking), so tags in the container can forward them to GA4, Ads, or any other destination.
 
-**Google Tag Manager**
-* Installs [Google Tag Manager](https://support.google.com/tagmanager/answer/6103696?hl=en) globally
+## Settings
 
-
-**Google Ecommerce Events**
-* [Product Detail Impressions](https://developers.google.com/analytics/devguides/collection/ua/gtm/enhanced-ecommerce#details)
-* [Add to Cart](https://developers.google.com/analytics/devguides/collection/ua/gtm/enhanced-ecommerce#cart)
-* [Checkout](https://developers.google.com/analytics/devguides/collection/ua/gtm/enhanced-ecommerce#checkout)
-* [Purchases](https://developers.google.com/analytics/devguides/collection/ua/gtm/enhanced-ecommerce#purchases)
-
-
-See tracking.js for a complete detailed view of the implementation.
+| Setting | Notes |
+|---|---|
+| Enable Google Tag Manager | Nothing loads until a Container ID is also set. |
+| Google Tag Manager Container ID | `GTM-XXXXXXX`. |
+| Skip Test Orders | Suppresses `purchase` for orders flagged `is_test`. |
 
 ## Events pushed to the dataLayer
 
