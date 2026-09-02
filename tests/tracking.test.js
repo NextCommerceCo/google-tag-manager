@@ -62,7 +62,7 @@ test('begin_checkout maps a multi-line cart; null category entries are skipped',
     const { top, emit } = boot({});
     const second = { ...line, product_id: 222, sku: 'PILLOW', product_title: 'Pillow Cover', variant_title: '', quantity: 1, price_incl_tax: '39.99', total_discount: '0.00' };
     emit('checkout_started', { ...checkout, lines: [line, second] });
-    emit('product_category_viewed', [null, { id: 5, title: 'Sheets', purchase_info: { price: { currency: 'USD', price: '109.99' } } }]);
+    emit('product_category_viewed', [null, { id: null, title: 'Broken' }, { id: 5, title: 'Sheets', purchase_info: { price: { currency: 'USD', price: '109.99' } } }]);
     const [begin, list] = ecommerceEvents(top);
     assert.equal(begin.event, 'begin_checkout');
     assert.equal(begin.ecommerce.coupon, 'SAVE10');
