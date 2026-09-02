@@ -58,6 +58,22 @@ test('remove_from_cart, view_item_list and add_shipping_info are mapped', () => 
     assert.equal(ecommerceEvents(top)[2].ecommerce.shipping_tier, 'Express');
 });
 
+test('begin_checkout maps a multi-line cart; null category entries are skipped', () => {
+    const { top, emit } = boot({});
+    const second = { ...line, product_id: 222, sku: 'PILLOW', product_title: 'Pillow Cover', variant_title: '', quantity: 1, price_incl_tax: '39.99', total_discount: '0.00' };
+    emit('checkout_started', { ...checkout, lines: [line, second] });
+    emit('product_category_viewed', [null, { id: 5, title: 'Sheets', purchase_info: { price: { currency: 'USD', price: '109.99' } } }]);
+    const [begin, list] = ecommerceEvents(top);
+    assert.equal(begin.event, 'begin_checkout');
+    assert.equal(begin.ecommerce.coupon, 'SAVE10');
+    assert.deepEqual(plain(begin.ecommerce.items), [
+        { item_id: '111', item_name: 'Timeless Watch', sku: 'WATCH-BL', item_variant: 'Black', price: 79.99, discount: 5, quantity: 2, index: 0 },
+        { item_id: '222', item_name: 'Pillow Cover', sku: 'PILLOW', price: 39.99, discount: 0, quantity: 1, index: 1 },
+    ]);
+    assert.equal(list.ecommerce.items.length, 1);
+    assert.equal(list.ecommerce.item_list_id, '/p/');
+});
+
 test('purchase carries numeric totals and skips test orders only when asked', () => {
     const { top, emit } = boot({});
     emit('checkout_completed', checkout);

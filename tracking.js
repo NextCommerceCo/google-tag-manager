@@ -40,15 +40,16 @@ if (app.settings.google_tag_manager_enabled && app.settings.google_tag_manager_c
         };
 
         // One item shape for the whole funnel: item_id is the product id everywhere, sku and
-        // item_variant identify the child.
+        // item_variant identify the child. A product payload only names a sku when it has one
+        // (or a single variant); on a multi-variant PDP the viewed variant is not in the payload.
         var productItem = function (product, index) {
-            var price = product && product.purchase_info && product.purchase_info.price;
-            var variants = product && product.variants;
-            var category = product && product.categories && product.categories.length ? product.categories[0].name : undefined;
+            var price = product.purchase_info && product.purchase_info.price;
+            var variants = product.variants;
+            var category = product.categories && product.categories.length ? product.categories[0].name : undefined;
             return {
                 item_id: String(product.id),
                 item_name: product.title,
-                sku: product.sku || (variants && variants.length ? variants[0].sku : undefined),
+                sku: product.sku || (variants && variants.length === 1 ? variants[0].sku : undefined),
                 item_category: category,
                 price: num(price && price.price),
                 quantity: 1,
@@ -56,17 +57,20 @@ if (app.settings.google_tag_manager_enabled && app.settings.google_tag_manager_c
             };
         };
 
+        // Unit price/discount are derived from line totals; when the payload has no positive
+        // quantity they are left undefined rather than invented.
         var cartLineItem = function (line, index) {
-            var quantity = num(line.quantity) || 1;
-            var lineTotal = num(line.price_incl_tax);
-            var lineDiscount = num(line.total_discount);
+            var quantity = num(line.quantity);
+            var perUnit = function (total) {
+                return total === undefined || !(quantity > 0) ? undefined : round(total / quantity);
+            };
             return {
                 item_id: String(line.product_id),
                 item_name: line.product_title,
                 sku: line.sku || undefined,
                 item_variant: line.variant_title || undefined,
-                price: round(lineTotal === undefined ? undefined : lineTotal / quantity),
-                discount: round(lineDiscount === undefined ? undefined : lineDiscount / quantity),
+                price: perUnit(num(line.price_incl_tax)),
+                discount: perUnit(num(line.total_discount)),
                 quantity: quantity,
                 index: index
             };
@@ -88,11 +92,16 @@ if (app.settings.google_tag_manager_enabled && app.settings.google_tag_manager_c
             push(Object.assign({ event: 'page_view' }, pageFields()));
         });
 
+        // The category payload carries the products only (no category object), so the list is
+        // identified by the page: path as the stable id, title as the display name.
         analytics.subscribe('product_category_viewed', function (event) {
-            var products = Array.isArray(event.data) ? event.data : [];
+            var products = (Array.isArray(event.data) ? event.data : []).filter(function (product) {
+                return product && product.id !== undefined;
+            });
             if (!products.length) { return; }
             var first = products[0].purchase_info && products[0].purchase_info.price;
             pushEcommerce('view_item_list', {
+                item_list_id: pageFields().page_path,
                 item_list_name: pageFields().page_title,
                 currency: first && first.currency,
                 items: products.map(productItem)
