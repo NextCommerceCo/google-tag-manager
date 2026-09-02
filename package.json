@@ -1,0 +1,8 @@
+{
+  "name": "google-tag-manager",
+  "private": true,
+  "description": "Google Tag Manager app for Next Commerce storefronts",
+  "scripts": {
+    "test": "node --test"
+  }
+}
