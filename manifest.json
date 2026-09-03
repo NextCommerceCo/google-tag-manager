@@ -7,20 +7,27 @@
     "storefront_event_tracker": "tracking.js",
     "settings_schema": [
         {
-        "name": "google_tag_manager_enabled",
-        "type": "checkbox",
-        "label": "Enable Google Tag Manager",
-        "help_text": "Enable Google Tag Manager on your storefront.",
-        "default": false
+            "name": "google_tag_manager_enabled",
+            "type": "checkbox",
+            "label": "Enable Google Tag Manager",
+            "help_text": "Enable Google Tag Manager on your storefront.",
+            "default": false
         },
         {
-        "name": "google_tag_manager_container_id",
-        "type": "text",
-        "label": "Google Tag Manager Container ID",
-        "default": "",
-        "help_text": "Your GTM Container ID can be found in your GTM Container settings.",
-        "required": false,
-        "max_length": 250
+            "name": "google_tag_manager_container_id",
+            "type": "text",
+            "label": "Google Tag Manager Container ID",
+            "default": "",
+            "help_text": "Your GTM Container ID (GTM-XXXXXXX). The app does nothing until this is set.",
+            "required": false,
+            "max_length": 250
+        },
+        {
+            "name": "google_tag_manager_skip_test_orders",
+            "type": "checkbox",
+            "label": "Skip Test Orders",
+            "help_text": "Do not push the purchase event for test orders.",
+            "default": false
         }
     ]
 }
