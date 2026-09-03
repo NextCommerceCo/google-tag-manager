@@ -23,7 +23,7 @@ Google Tag Manager app for Next Commerce. Installs the GTM container on any stor
 | `checkout_shipping_method_submitted` | `add_shipping_info` |
 | `checkout_completed` | `purchase` |
 
-Each ecommerce push is preceded by `{ ecommerce: null }` as Google recommends. Items share identifiers across the funnel (`item_id` = product id, `sku`, `item_variant`, per-unit numeric `price` and `discount`). `value` on `begin_checkout`, `add_shipping_info` and `purchase` is item revenue (the sum of the lines, excluding tax where the payload provides `price_excl_tax`), as GA4 defines it; `shipping` and `tax` travel in their own keys.
+Each ecommerce push is preceded by `{ ecommerce: null }` as Google recommends. Items share identifiers across the funnel (`item_id` = product id, `sku`, `item_variant`, per-unit numeric `price` and `discount`). `value` on `begin_checkout`, `add_shipping_info` and `purchase` is item revenue (the sum of the lines' `price_excl_tax`; if a payload ever lacks that field the tax-inclusive total is used, so a store seeing values that include tax should check its payloads), as GA4 defines it; `shipping` and `tax` travel in their own keys.
 
 The `page_view` push exists for container triggers. The Google tag inside your container already sends its own page view, so do not attach a GA4 event tag to this push or page views double-count.
 
