@@ -95,8 +95,15 @@ if (app.settings.google_tag_manager_enabled && String(app.settings.google_tag_ma
             };
         };
 
-        // Unit price/discount are derived from line totals; when the payload has no positive
-        // quantity they are left undefined rather than invented.
+        // Line totals exclude tax where the payload offers it: tax is reported in its own
+        // parameter, so a tax-inclusive price would count it twice. Unit price/discount are
+        // derived from line totals; when the payload has no positive quantity they are left
+        // undefined rather than invented.
+        var lineTotal = function (line) {
+            var excl = num(line.price_excl_tax);
+            return excl === undefined ? num(line.price_incl_tax) : excl;
+        };
+
         var cartLineItem = function (line, index) {
             var quantity = num(line.quantity);
             var perUnit = function (total) {
@@ -107,7 +114,7 @@ if (app.settings.google_tag_manager_enabled && String(app.settings.google_tag_ma
                 item_name: line.product_title,
                 sku: line.sku || undefined,
                 item_variant: line.variant_title || undefined,
-                price: perUnit(num(line.price_incl_tax)),
+                price: perUnit(lineTotal(line)),
                 discount: perUnit(num(line.total_discount)),
                 quantity: quantity,
                 index: index
@@ -127,7 +134,7 @@ if (app.settings.google_tag_manager_enabled && String(app.settings.google_tag_ma
             var lines = checkoutLines(data);
             var value;
             lines.forEach(function (line) {
-                var total = num(line.price_incl_tax);
+                var total = lineTotal(line);
                 if (total !== undefined) { value = (value || 0) + total; }
             });
             return {
@@ -190,7 +197,7 @@ if (app.settings.google_tag_manager_enabled && String(app.settings.google_tag_ma
                 if (!line || line.product_id == null) { return; }
                 pushEcommerce(name, {
                     currency: line.currency,
-                    value: num(line.price_incl_tax),
+                    value: lineTotal(line),
                     items: [cartLineItem(line, 0)]
                 });
             };
